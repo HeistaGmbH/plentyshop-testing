@@ -101,7 +101,7 @@ export default defineNuxtConfig({
         'vat-number-validation',
       ],
       cookieGroups: cookieConfig,
-      turnstileSiteKey: process.env?.CLOUDFLARETURNSTILEAPISITEKEY ?? '0x4AAAAAAB4eXEwY6weTSyJ7',
+      turnstileSiteKey: process.env?.CLOUDFLARETURNSTILEAPISITEKEY ?? '',
       useAvif: process.env?.IMAGEAVIF === 'true' || process.env?.NUXT_PUBLIC_USE_AVIF === 'true',
       useWebp: process.env?.IMAGEWEBP === 'true' || process.env?.NUXT_PUBLIC_USE_WEBP === 'true',
       validateReturnReasons: process.env.VALIDATE_RETURN_REASONS === '1',
