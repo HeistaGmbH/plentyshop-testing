@@ -49,9 +49,14 @@ const NarrowContainer = resolveComponent('NarrowContainer');
 const { $isPreview } = useNuxtApp();
 const props = withDefaults(defineProps<EditablePageProps>(), {
   hasEnabledActions: true,
+  preventBlocksRequest: false,
 });
 
-const { data, getBlocksServer, cleanData } = useCategoryTemplate();
+const { data, getBlocksServer, cleanData } = useCategoryTemplate(
+  props.identifier.toString(),
+  props.type.toString(),
+  useNuxtApp().$i18n.locale.value,
+);
 const dataIsEmpty = computed(() => data.value.length === 0);
 
 const isContentEmptyInEditor = computed(
@@ -62,7 +67,9 @@ const isContentEmptyInLive = computed(
   () => dataIsEmpty.value || (data.value.length === 1 && data.value[0]?.name === 'Footer'),
 );
 
-await getBlocksServer(props.identifier, props.type);
+if (!props.preventBlocksRequest) {
+  await getBlocksServer(props.identifier, props.type);
+}
 
 const { footerCache } = useFooter();
 addFooterBlock({

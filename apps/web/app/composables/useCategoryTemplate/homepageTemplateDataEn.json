@@ -212,6 +212,9 @@
       },
       "button": {
         "label": "Subscribe"
+      },
+      "settings": {
+        "emailFolderId": 1
       }
     }
   },
@@ -239,7 +242,6 @@
         "title": "",
         "htmlDescription": ""
       },
-      "footnote": "© PlentyONE GmbH 2025",
       "footnoteAlign": "right",
       "colors": {
         "background": "#cfe4ec",

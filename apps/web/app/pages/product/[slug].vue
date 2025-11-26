@@ -1,6 +1,6 @@
 <template>
   <NuxtLayout name="default" :breadcrumbs="breadcrumbs">
-    <EditablePage v-if="config.enableProductEditing" :identifier="'0'" :type="'product'" />
+    <EditablePage v-if="config.enableProductEditing" :identifier="'0'" :type="'product'" prevent-blocks-request />
 
     <NarrowContainer v-else>
       <div class="md:grid gap-x-6 grid-areas-product-page grid-cols-product-page">
@@ -48,19 +48,22 @@
 import { SfIconChevronRight } from '@storefront-ui/vue';
 import type { Product } from '@plentymarkets/shop-api';
 import { productGetters, reviewGetters, categoryTreeGetters } from '@plentymarkets/shop-api';
-
 const route = useRoute();
 const { t } = useI18n();
 const { setCurrentProduct } = useProducts();
+const { setBlocksListContext } = useBlocksList();
 const { setProductMetaData, setProductRobotsMetaData, setProductCanonicalMetaData } = useStructuredData();
 const { buildProductLanguagePath } = useLocalization();
 const { addModernImageExtensionForGallery } = useModernImage();
 const { productParams, productId } = createProductParams(route.params);
-const { data: product, fetchProduct, setProductMeta, setBreadcrumbs, breadcrumbs } = useProduct(productId);
+const { productForEditor, fetchProduct, setProductMeta, setBreadcrumbs, breadcrumbs } = useProduct(productId);
+const product = ref(productForEditor);
+const { disableActions } = useEditor();
 const { data: productReviews, fetchProductReviews } = useProductReviews(Number(productId));
 const { data: categoryTree } = useCategoryTree();
 const { open, openDrawer } = useProductLegalDetailsDrawer();
 const { setPageMeta } = usePageMeta();
+const { resetNotification } = useEditModeNotification(disableActions);
 
 const config = useRuntimeConfig().public;
 
@@ -101,7 +104,21 @@ if (Object.keys(product.value).length === 0) {
   });
 }
 setCurrentProduct(product.value || ({} as Product));
+
+watch(
+  disableActions,
+  () => {
+    setCurrentProduct(productForEditor.value || ({} as Product));
+  },
+  { immediate: true },
+);
+
 setProductMeta();
+setBlocksListContext('product');
+
+onBeforeRouteLeave(() => {
+  setCurrentProduct({} as Product);
+});
 
 async function fetchReviews() {
   const productVariationId = productGetters.getVariationId(product.value);
@@ -176,6 +193,10 @@ const observeRecommendedSection = () => {
     observer.observe(recommendedSection.value);
   }
 };
+
+onBeforeRouteLeave(() => {
+  resetNotification();
+});
 
 onNuxtReady(() => observeRecommendedSection());
 </script>

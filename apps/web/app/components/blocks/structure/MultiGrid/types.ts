@@ -16,6 +16,7 @@ export type MultiGridProps = {
   configuration: {
     columnWidths: number[];
     layout?: MultiGridLayout;
+    sticky?: number[];
   };
   meta: {
     uuid: string;
@@ -44,6 +45,7 @@ export type ColumnBlock = Block & {
   content?: Block[];
   configuration: {
     columnWidths: number[];
+    sticky?: number[];
     layout?: {
       gap: string;
       marginTop?: number;

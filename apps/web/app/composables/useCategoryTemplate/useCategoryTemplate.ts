@@ -7,31 +7,27 @@ import type {
 } from './types';
 import type { Block } from '@plentymarkets/shop-api';
 
-import homepageTemplateDataDe from './homepageTemplateDataDe.json';
-import homepageTemplateDataEn from './homepageTemplateDataEn.json';
-import categoryTemplateData from './categoryTemplateData.json';
-import productTemplateData from './productTemplateData.json';
 import { migrateImageContent } from '~/utils/migrate-image-content';
 import type { OldContent } from '~/utils/migrate-recommended-content';
 import { migrateRecommendedContent } from '~/utils/migrate-recommended-content';
 import type { ProductRecommendedProductsContent } from '~/components/blocks/ProductRecommendedProducts/types';
 
-const useLocaleSpecificHomepageTemplate = (locale: string) =>
-  locale === 'de' ? (homepageTemplateDataDe as Block[]) : (homepageTemplateDataEn as Block[]);
-
-const useProductTemplateData = () => productTemplateData as Block[];
-
-const useCategoryTemplateData = () => categoryTemplateData as Block[];
-
-export const useCategoryTemplate: UseCategoryTemplateReturn = (blocks?: string) => {
-  const state = useState<UseCategoryTemplateState>(`useCategoryTemplate${blocks ? `-${blocks}` : ''}`, () => ({
-    data: [],
-    cleanData: [],
-    categoryTemplateData: null,
-    loading: false,
-  }));
-
-  const { $i18n } = useNuxtApp();
+export const useCategoryTemplate: UseCategoryTemplateReturn = (
+  identifier: string = 'unknown',
+  type: string = 'unknown',
+  locale: string = 'locale',
+  blocks: string = 'all',
+) => {
+  const state = useState<UseCategoryTemplateState>(
+    `useCategoryTemplate-${identifier}-${type}-${locale}-${blocks}`,
+    () => ({
+      data: [],
+      cleanData: [],
+      categoryTemplateData: null,
+      defaultTemplateData: [],
+      loading: false,
+    }),
+  );
 
   const ensureFooterBlock = async () => {
     const { fetchFooterSettings } = useFooter();
@@ -61,7 +57,6 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (blocks?: string) 
     state.value.loading = true;
 
     const { $i18n } = useNuxtApp();
-    const { data: productsCatalog } = useProducts();
 
     const { data, error } = await useAsyncData(`${$i18n.locale.value}-${type}-${identifier}-${blocks}`, () =>
       useSdk().plentysystems.getBlocks({ identifier, type, blocks }),
@@ -75,26 +70,7 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (blocks?: string) 
       return;
     }
 
-    let fetchedBlocks: Block[] = data?.value?.data ?? [];
-
-    if (!fetchedBlocks.length && type === 'immutable') {
-      fetchedBlocks = useLocaleSpecificHomepageTemplate($i18n.locale.value);
-    }
-
-    if (!fetchedBlocks.length && type === 'category' && productsCatalog.value.category?.type === 'item') {
-      fetchedBlocks = useCategoryTemplateData();
-    }
-
-    if (!fetchedBlocks.length && type === 'product') {
-      fetchedBlocks = useProductTemplateData();
-    }
-
-    if (Array.isArray(fetchedBlocks)) {
-      migrateAllImageBlocks(fetchedBlocks);
-    }
-
-    state.value.data = fetchedBlocks;
-    state.value.cleanData = markRaw(JSON.parse(JSON.stringify(fetchedBlocks)));
+    setupBlocks(data?.value?.data ?? []);
 
     await ensureFooterBlock();
   };
@@ -102,33 +78,33 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (blocks?: string) 
   const getBlocks: GetBlocks = async (identifier, type, blocks?) => {
     state.value.loading = true;
 
-    const { data: productsCatalog } = useProducts();
-
     const response = await useSdk().plentysystems.getBlocks({ identifier, type, blocks });
     const data = response?.data;
 
     state.value.loading = false;
 
-    if (!data?.length) {
-      if (type === 'immutable') {
-        state.value.data = useLocaleSpecificHomepageTemplate($i18n.locale.value);
-      }
-
-      if (type === 'category' && productsCatalog.value.category?.type === 'item') {
-        state.value.data = useCategoryTemplateData();
-      }
-    } else {
-      state.value.data = data ?? state.value.data;
-    }
-
-    if (Array.isArray(state.value.data)) {
-      migrateAllImageBlocks(state.value.data);
-    }
-
-    state.value.cleanData = markRaw(JSON.parse(JSON.stringify(state.value.data)));
+    setupBlocks(data ?? []);
   };
+
+  const setupBlocks = (fetchedBlocks: Block[]) => {
+    const blocks = fetchedBlocks.length ? fetchedBlocks : state.value.defaultTemplateData;
+
+    if (Array.isArray(blocks)) {
+      migrateAllImageBlocks(blocks);
+    }
+
+    if (JSON.stringify(state.value.data) !== JSON.stringify(blocks)) {
+      state.value.data.splice(0, state.value.data.length, ...blocks);
+    }
+    state.value.cleanData = markRaw(JSON.parse(JSON.stringify(blocks)));
+  };
+
   const updateBlocks: UpdateBlocks = (blocks) => {
     state.value.data = blocks;
+  };
+
+  const setDefaultTemplate = (blocks: Block[]) => {
+    state.value.defaultTemplateData = blocks;
   };
 
   /**
@@ -189,6 +165,8 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (blocks?: string) 
     getBlocks,
     getBlocksServer,
     updateBlocks,
+    setupBlocks,
+    setDefaultTemplate,
     ...toRefs(state.value),
   };
 };

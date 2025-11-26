@@ -132,6 +132,7 @@
         class="relative text-white hover:text-white active:text-white hover:bg-header-400 active:bg-header-400 rounded-md md:hidden"
         square
         data-testid="open-languageselect-button"
+        :style="{ color: iconColor }"
         :aria-label="t('languageSelector')"
         :disabled="(showConfigurationDrawer && isEditing) || (showConfigurationDrawer && disableActions)"
         @click="toggleLanguageSelect()"
@@ -142,6 +143,7 @@
         variant="tertiary"
         class="relative text-white hover:text-white active:text-white hover:bg-header-400 active:bg-header-400 rounded-md md:hidden"
         square
+        :style="{ color: iconColor }"
         :aria-label="t('openSearchModalButtonLabel')"
         @click="searchModalOpen"
       >
@@ -219,6 +221,7 @@ import {
 } from '@storefront-ui/vue';
 import LanguageSelector from '~/components/LanguageSelector/LanguageSelector.vue';
 import { paths } from '~/utils/paths';
+import { handleLogout } from '~/utils/logout';
 
 const isLogin = ref(true);
 const { data: cart } = useCart();
@@ -272,11 +275,7 @@ watch(
   },
 );
 
-const logOut = async () => {
-  accountDropdownToggle();
-  await logout();
-  window.location.reload();
-};
+const logOut = () => handleLogout({ logout, toggle: accountDropdownToggle });
 
 const accountDropdown = computed(() => [
   {

@@ -4,7 +4,7 @@
       v-model="textsOpen"
       summary-active-class="bg-neutral-100"
       summary-class="w-full hover:bg-neutral-100 px-4 py-5 flex justify-between items-center select-none border-b"
-      data-testid="recommended-form-source"
+      data-testid="open-recommended-products-form-texts"
     >
       <template #summary>
         <h2>{{ getEditorTranslation('texts-label') }}</h2>
@@ -106,7 +106,7 @@
       v-model="sourceOpen"
       summary-active-class="bg-neutral-100"
       summary-class="w-full hover:bg-neutral-100 px-4 py-5 flex justify-between items-center select-none border-b"
-      data-testid="recommended-form-source"
+      data-testid="open-recommended-products-form-source"
     >
       <template #summary>
         <h2>{{ getEditorTranslation('source-label') }}</h2>
@@ -151,6 +151,8 @@
           name="itemId"
           type="text"
           :placeholder="getEditorTranslation('product-id-placeholder')"
+          :disabled="Object.keys(currentProduct).length > 0"
+          :wrapper-class="{ '!bg-disabled-100 !ring-disabled-300 !ring-1': Object.keys(currentProduct).length > 0 }"
           @input="debouncedFn($event)"
         />
 
@@ -202,7 +204,12 @@ import { productGetters } from '@plentymarkets/shop-api';
 import Multiselect from 'vue-multiselect';
 import 'vue-multiselect/dist/vue-multiselect.min.css';
 
-const { data } = useCategoryTemplate();
+const route = useRoute();
+const { data } = useCategoryTemplate(
+  route?.meta?.identifier as string,
+  route.meta.type as string,
+  useNuxtApp().$i18n.locale.value,
+);
 const { blockUuid } = useSiteConfiguration();
 const { findOrDeleteBlockByUuid } = useBlockManager();
 const { currentProduct } = useProducts();
@@ -279,7 +286,7 @@ const crossSellingModel = computed({
 
 const categoryOptions = computed(() => categoriesData.value.entries.filter((cat) => cat.right !== 'customer'));
 
-const firstCategoryId = (categoryTree.value?.[0]?.id || '').toString();
+const firstCategoryId = (categoryTree.value?.find((category) => category.type === 'item')?.id || '').toString();
 
 const categoryIdModel = computed({
   get() {
