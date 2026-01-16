@@ -4,7 +4,7 @@
       v-for="(column, colIndex) in columns"
       :key="colIndex"
       :class="getColumnClasses(colIndex)"
-      class="group/col relative"
+      class="group/col relative z-[1]"
       data-testid="multi-grid-column"
     >
       <div
@@ -29,7 +29,12 @@
             <div
               class="absolute inset-0 z-30 flex items-center justify-center opacity-0 invisible pointer-events-none group-hover/row:opacity-100 group-hover/row:visible group-hover/row:pointer-events-auto"
             >
-              <UiBlockActions :block="row" :index="colIndex" :actions="getBlockActions()" />
+              <UiBlockActions
+                data-testid="multigrid-block-actions"
+                :block="row"
+                :index="colIndex"
+                :actions="getBlockActions()"
+              />
             </div>
           </template>
         </ClientOnly>
@@ -50,6 +55,7 @@ import type { AlignableBlock, MultiGridProps } from '~/components/blocks/structu
 import type { Block } from '@plentymarkets/shop-api';
 
 const { content, configuration } = defineProps<MultiGridProps>();
+const route = useRoute();
 
 const hoveredRowUuid = ref<string | null>(null);
 const onRowEnter = (row: Block) => {
@@ -96,8 +102,6 @@ const gridInlineStyle = computed(() => ({
     configuration.layout?.marginBottom !== undefined
       ? `${configuration.layout.marginBottom}px`
       : `${defaultMarginBottom.value}px`,
-  marginLeft: configuration.layout?.marginLeft !== undefined ? `${configuration.layout.marginLeft}px` : '40px',
-  marginRight: configuration.layout?.marginRight !== undefined ? `${configuration.layout.marginRight}px` : '40px',
 }));
 const getGridClasses = () => {
   return gridClassFor({ mobile: 1, tablet: 12, desktop: 12 }, [gridGapClass.value ?? '', 'items-start']);
@@ -108,7 +112,10 @@ const getColumnClasses = (colIndex: number) => {
   const classes = [`col-span-${columnWidth}`];
 
   if (Array.isArray(configuration.sticky) && configuration.sticky.includes(colIndex)) {
-    classes.push('md:sticky', 'md:top-40');
+    classes.push('md:sticky');
+
+    const topValue = route.meta?.type === 'product' ? 'md:top-40' : 'md:top-5';
+    classes.push(topValue);
   }
 
   return classes;
@@ -128,7 +135,7 @@ const enableActions = computed(() => attrs.enableActions === true);
 const blockHasData = (block: Block): boolean => !!block.content && Object.keys(block.content).length > 0;
 
 const showOverlay = computed(
-  () => (block: Block) => enableActions.value && $isPreview && !isDragging.value && blockHasData(block),
+  () => (block: Block) => enableActions.value && !!$isPreview && !isDragging.value && blockHasData(block),
 );
 
 const isAlignable = (b: Block): b is AlignableBlock =>

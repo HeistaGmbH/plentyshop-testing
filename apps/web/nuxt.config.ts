@@ -69,6 +69,13 @@ export default defineNuxtConfig({
         output: {
           manualChunks: {
             vuetify: ['vuetify', '@mdi/js'],
+            cmmain: ['codemirror'],
+            cmplugins: [
+              'js-beautify',
+              '@codemirror/lang-css',
+              '@codemirror/lang-javascript',
+              '@codemirror/theme-one-dark',
+            ],
           },
         },
       },
@@ -209,6 +216,7 @@ export default defineNuxtConfig({
       showCustomerReferenceComponent: process.env.NUXT_PUBLIC_SHOW_CUSTOMER_REFERENCE_COMPONENT === 'true',
       bundleItemDisplay: process.env.NUXT_PUBLIC_BUNDLE_ITEM_DISPLAY || '2',
       externalVatCheckInactive: process.env.NUXT_PUBLIC_EXTERNAL_VAT_CHECK_INACTIVE === 'true',
+      showNotifyMe: process.env.NUXT_PUBLIC_SHOW_NOTIFY_ME === 'true',
       itemSortByMonthlySales: process.env.NUXT_PUBLIC_ITEM_SORT_BY_MONTHLY_SALES || '0',
       defaultCustomerClassId: process.env.NUXT_PUBLIC_DEFAULT_CUSTOMER_CLASS_ID || '0',
       defaultB2BCustomerClass: process.env.NUXT_PUBLIC_DEFAULT_B2B_CUSTOMER_CLASS || '0',
@@ -229,6 +237,7 @@ export default defineNuxtConfig({
       manufacturerFaxNumber: process.env.NUXT_PUBLIC_MANUFACTURER_FAX_NUMBER || '0',
       manufacturerEmail: process.env.NUXT_PUBLIC_MANUFACTURER_EMAIL || '0',
       manufacturerContactUrl: process.env.NUXT_PUBLIC_MANUFACTURER_CONTACT_URL || '0',
+      customAssetsSafeMode: process.env.NUXT_PUBLIC_CUSTOM_ASSETS_SAFE_MODE === 'true',
     },
   },
   modules: [
@@ -376,34 +385,6 @@ export default defineNuxtConfig({
             expiration: {
               maxEntries: 300,
               maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-        {
-          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'google-fonts-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
-            },
-            cacheableResponse: {
-              statuses: [0, 200],
-            },
-          },
-        },
-        {
-          urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-          handler: 'NetworkFirst',
-          options: {
-            cacheName: 'gstatic-fonts-cache',
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
             },
             cacheableResponse: {
               statuses: [0, 200],

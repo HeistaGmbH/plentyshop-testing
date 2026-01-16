@@ -33,7 +33,7 @@
 
       <ClientOnly>
         <UiBlockActions
-          v-if="enableActions && blockHasData && blockHasData(block) && clientPreview && root && !isDragging"
+          v-if="enableActions && clientPreview && root && !isDragging"
           :key="`${block.meta.uuid}`"
           :class="[
             'opacity-0 block-actions',
@@ -60,7 +60,6 @@
             :is-clicked="isClicked"
             :clicked-block-index="clickedBlockIndex"
             :is-tablet="isTablet"
-            :block-has-data="blockHasData"
             :change-block-position="changeBlockPosition"
             :column-length="slotProps.columnLength"
             :is-row-hovered="slotProps.isRowHovered"
@@ -107,7 +106,9 @@ import type { BlockPosition } from '~/composables/useBlockManager/types';
 import type { PageBlockProps } from './types';
 import type { Block } from '@plentymarkets/shop-api';
 
-const props = defineProps<PageBlockProps>();
+const props = withDefaults(defineProps<PageBlockProps>(), {
+  enableActions: false,
+});
 
 const { $isPreview } = useNuxtApp();
 const { locale, defaultLocale } = useI18n();
