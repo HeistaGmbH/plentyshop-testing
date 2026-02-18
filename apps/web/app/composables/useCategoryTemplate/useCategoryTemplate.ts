@@ -5,11 +5,8 @@ import type {
   GetBlocks,
   SaveBlocks,
 } from './types';
-import type { Block } from '@plentymarkets/shop-api';
-
-import { migrateImageContent } from '~/utils/migrate-image-content';
-import type { OldContent } from '~/utils/migrate-recommended-content';
-import { migrateRecommendedContent } from '~/utils/migrate-recommended-content';
+import type { ApiError, Block } from '@plentymarkets/shop-api';
+import type { TextCardContent } from '~/components/blocks/TextCard/types';
 import type { ProductRecommendedProductsContent } from '~/components/blocks/ProductRecommendedProducts/types';
 
 export const useCategoryTemplate: UseCategoryTemplateReturn = (
@@ -29,17 +26,9 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
     }),
   );
 
-  const ensureFooterBlock = async () => {
-    const { fetchFooterSettings } = useFooter();
+  const migrateAllBlocks = (blocks: Block[]) => {
+    const config = useRuntimeConfig().public;
 
-    try {
-      await fetchFooterSettings();
-    } catch (error) {
-      console.warn('Failed to ensure footer block:', error);
-    }
-  };
-
-  const migrateAllImageBlocks = (blocks: Block[]) => {
     for (const block of blocks) {
       if (block.name === 'Image' && block.content) {
         block.content = migrateImageContent(block.content);
@@ -47,8 +36,14 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
       if (block.name === 'ProductRecommendedProducts' && block.content) {
         block.content = migrateRecommendedContent(block.content as OldContent | ProductRecommendedProductsContent);
       }
+      if (block.name === 'TextCard' && block.content) {
+        block.content = migrateTextCardContent(
+          block.content as Partial<TextCardContent>,
+          config.enableRichTextEditorV2,
+        );
+      }
       if (Array.isArray(block.content)) {
-        migrateAllImageBlocks(block.content);
+        migrateAllBlocks(block.content);
       }
     }
   };
@@ -71,8 +66,6 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
     }
 
     setupBlocks(data?.value?.data ?? []);
-
-    await ensureFooterBlock();
   };
 
   const getBlocks: GetBlocks = async (identifier, type, blocks?) => {
@@ -90,7 +83,7 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
     const blocks = fetchedBlocks.length ? fetchedBlocks : state.value.defaultTemplateData;
 
     if (Array.isArray(blocks)) {
-      migrateAllImageBlocks(blocks);
+      migrateAllBlocks(blocks);
     }
 
     if (JSON.stringify(state.value.data) !== JSON.stringify(blocks)) {
@@ -106,6 +99,33 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
   const setDefaultTemplate = (blocks: Block[]) => {
     state.value.defaultTemplateData = blocks;
   };
+
+  const headerBlocks = computed({
+    get: () => state.value.data.filter((block) => block.name === 'Header'),
+    set: (newHeaderBlocks: Block[]) => {
+      const main = state.value.data.filter((b) => b.name !== 'Header' && b.name !== 'Footer');
+      const footer = state.value.data.filter((b) => b.name === 'Footer');
+      state.value.data.splice(0, state.value.data.length, ...newHeaderBlocks, ...main, ...footer);
+    },
+  });
+
+  const mainBlocks = computed({
+    get: () => state.value.data.filter((block) => block.name !== 'Header' && block.name !== 'Footer'),
+    set: (newMainBlocks: Block[]) => {
+      const header = state.value.data.filter((b) => b.name === 'Header');
+      const footer = state.value.data.filter((b) => b.name === 'Footer');
+      state.value.data.splice(0, state.value.data.length, ...header, ...newMainBlocks, ...footer);
+    },
+  });
+
+  const footerBlocks = computed({
+    get: () => state.value.data.filter((block) => block.name === 'Footer'),
+    set: (newFooterBlocks: Block[]) => {
+      const header = state.value.data.filter((b) => b.name === 'Header');
+      const main = state.value.data.filter((b) => b.name !== 'Header' && b.name !== 'Footer');
+      state.value.data.splice(0, state.value.data.length, ...header, ...main, ...newFooterBlocks);
+    },
+  });
 
   /**
    * @description Function for fetching the category template from a category id
@@ -155,6 +175,7 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
       }
       return true;
     } catch (error) {
+      useHandleError(error as ApiError);
       console.error('Error saving blocks:', error);
       return false;
     } finally {
@@ -169,6 +190,9 @@ export const useCategoryTemplate: UseCategoryTemplateReturn = (
     updateBlocks,
     setupBlocks,
     setDefaultTemplate,
+    headerBlocks,
+    mainBlocks,
+    footerBlocks,
     ...toRefs(state.value),
   };
 };
