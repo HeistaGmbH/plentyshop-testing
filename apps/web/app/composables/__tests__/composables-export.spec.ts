@@ -30,6 +30,17 @@ describe('composables index exports', () => {
     'useFullWidthToggle',
     'useRichTextEditor',
     'useHtmlEditorMode',
+    'useGenerateTailwindPalette',
+    'useUtilityBarForm',
+    'useUtilityBarConfiguration',
+    'useUtilityBarActions',
+    'useUtilityBarState',
+    'useBlockIsFake',
+    'useIsUsingFakeData',
+    'useShouldShow',
+    'useLazyProductImage',
+    'useSliderImagePreload',
+    'useNearViewport',
   ];
 
   const allFileModules = fs

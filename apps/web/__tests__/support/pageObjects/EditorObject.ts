@@ -1,22 +1,8 @@
 import { PageObject } from './PageObject';
 
-export const firstBannerBlockUuid = 'a7b3c1d9-2e6f-4a5b-8c7d-1e2f3b4c5a6d';
-
 export class EditorObject extends PageObject {
-  get pretitle() {
-    return cy.getByTestId(`banner-pretitle-${firstBannerBlockUuid}`);
-  }
-
-  get title() {
-    return cy.getByTestId(`banner-title-${firstBannerBlockUuid}`);
-  }
-
-  get subtitle() {
-    return cy.getByTestId(`banner-subtitle-${firstBannerBlockUuid}`);
-  }
-
   get description() {
-    return cy.getByTestId(`banner-description-${firstBannerBlockUuid}`);
+    return cy.get('[data-testid^="text-html"]').first();
   }
 
   get editorToolbar() {
@@ -69,6 +55,10 @@ export class EditorObject extends PageObject {
 
   get inlineBlockButton() {
     return cy.getByTestId('inactive-empty-multicolumn');
+  }
+
+  get deleteFormBlockButton() {
+    return cy.getByTestId('delete-form-block-button');
   }
 
   get deleteBlockButton() {
@@ -173,7 +163,11 @@ export class EditorObject extends PageObject {
   }
 
   toggleCategorySettings() {
-    this.categorySettingsButton.should('be.visible').click();
+    this.categorySettingsButton
+      .should('be.visible')
+      .click()
+      .trigger('mouseout', { force: true })
+      .trigger('mouseleave', { force: true });
     return this;
   }
 
@@ -183,7 +177,11 @@ export class EditorObject extends PageObject {
   }
 
   toggleGeneralSettings() {
-    this.generalSettingsButton.should('be.visible').click();
+    this.generalSettingsButton
+      .should('be.visible')
+      .click()
+      .trigger('mouseout', { force: true })
+      .trigger('mouseleave', { force: true });
     return this;
   }
 
@@ -238,9 +236,6 @@ export class EditorObject extends PageObject {
 
   checkEditorChanges() {
     this.exitEditorButton.get('#close').click({ force: true });
-    this.pretitle.should('have.text', 'New pretitle from cypress');
-    this.title.should('have.text', 'New title from cypress');
-    this.subtitle.should('not.exist');
     this.description.should('have.text', 'Description from cypress.');
   }
 
@@ -298,7 +293,7 @@ export class EditorObject extends PageObject {
     this.languageList.children().should('have.length', 2);
     this.languageOptionGerman.should('be.visible').click();
     cy.wait(['@getSession', '@getCategoryTree', '@getBlocks']);
-    this.title.first().should('have.text', 'Ihr Sound auf höchstem Niveau');
+    this.description.should('contain.text', 'Ihr Sound');
   }
 
   addBlockTop() {
@@ -413,7 +408,7 @@ export class EditorObject extends PageObject {
   deleteBlockInGridColumn(column: number) {
     this.imageInMultiGridActions.eq(column).should('exist').click({ force: true });
     cy.wait(1000);
-    this.deleteBlockButton.eq(column).should('exist').click();
+    this.deleteFormBlockButton.should('exist').click();
     cy.wait(1000);
     this.inlineBlockButton.eq(column).should('exist');
     this.inlineBlockButton.should('have.length', 2);

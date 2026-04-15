@@ -1,24 +1,18 @@
 <template>
   <UiAccordionItem
-    :model-value="true"
+    :model-value="expandedTextSettings"
     summary-active-class="bg-neutral-100"
     summary-class="w-full hover:bg-neutral-100 px-4 py-5 flex justify-between items-center select-none border-b"
   >
     <template #summary>
       <h2>{{ getEditorTranslation('text-label') }}</h2>
     </template>
-    <div class="py-2 px-2">
-      <EditorRichTextEditor
-        v-model="editingText"
-        v-model:expanded="expandedToolbar"
-        :min-height="100"
-        :expandable="true"
-      />
-    </div>
+
+    <EditorRichTextEditorForm v-model="editingText" :text-align="'center'" />
   </UiAccordionItem>
 
   <UiAccordionItem
-    v-model="expandedSettings"
+    v-model="expandedLayoutSettings"
     summary-active-class="bg-neutral-100"
     summary-class="w-full hover:bg-neutral-100 px-4 py-5 flex justify-between items-center select-none border-b"
   >
@@ -60,17 +54,17 @@ const { data } = useBlockTemplates(
   useNuxtApp().$i18n.locale.value,
 );
 const { findOrDeleteBlockByUuid } = useBlockManager();
-const expandedToolbar = ref(true);
-const expandedSettings = ref(true);
+const expandedLayoutSettings = ref(true);
+const expandedTextSettings = ref(true);
 
 const block = computed(
   () => (findOrDeleteBlockByUuid(data.value, props.uuid || blockUuid.value) || {}) as AnnouncementBarProps,
 );
 
 const editingText = computed({
-  get: () => block.value.content.text ?? '',
-  set: (val) => {
-    block.value.content.text = val;
+  get: () => decodeHtmlEntities(block.value.content.text ?? ''),
+  set: (val: string) => {
+    block.value.content.text = val ?? '';
   },
 });
 

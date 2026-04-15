@@ -13,19 +13,24 @@ export const useEditorUnsavedChangesGuard = (options: UseEditorUnsavedChangesGua
   const { isEditingEnabled } = useEditor();
   const { settingsIsDirty } = useSiteSettings();
   const { closeDrawer } = useSiteConfiguration();
-  const { resetFooterToSaved } = useBlockTemplates();
+  const route = useRoute();
+  const { resetFooterToSaved, resetHeaderToSaved } = useBlockTemplates(
+    (route.meta.identifier as string) ?? 'unknown',
+    (route.meta.type as string) ?? 'unknown',
+    useNuxtApp().$i18n.locale.value,
+  );
   const confirmMessage = getEditorUITranslation('unsaved-changes-confirm');
 
   const hasUnsavedChanges = customHasUnsavedChanges || (() => isEditingEnabled.value || settingsIsDirty.value);
 
-  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  const handleBeforeUnload = (event: Event) => {
     if (!hasUnsavedChanges()) return;
     event.preventDefault();
   };
 
   const handleConfirmLeave = async () => {
     if (isEditingEnabled.value) {
-      await resetFooterToSaved();
+      await Promise.all([resetHeaderToSaved(), resetFooterToSaved()]);
       isEditingEnabled.value = false;
     }
 
@@ -44,18 +49,16 @@ export const useEditorUnsavedChangesGuard = (options: UseEditorUnsavedChangesGua
     window.removeEventListener('beforeunload', handleBeforeUnload);
   });
 
-  onBeforeRouteLeave(async (to, from, next) => {
+  onBeforeRouteLeave(async () => {
     if (hasUnsavedChanges()) {
       const confirmation = window.confirm(confirmMessage);
 
       if (confirmation) {
         await handleConfirmLeave();
-        next();
+        return true;
       } else {
-        next(false);
+        return false;
       }
-    } else {
-      next();
     }
   });
 };
