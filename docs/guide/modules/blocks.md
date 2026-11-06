@@ -126,13 +126,9 @@ Because the loader processes core first and then Nuxt modules, and each `.vue` f
                name: 'TextCard', // must match the core block name
                type: 'content',
                meta: { uuid: '00000000-0000-4000-8000-000000000003' },
-               content: {
-                 /* your defaults */
-               },
+               content: {/* your defaults */},
              },
-             de: {
-               /* … */
-             },
+             de: {/* … */},
            },
          },
        ],
@@ -148,4 +144,5 @@ Because the loader processes core first and then Nuxt modules, and each `.vue` f
 
 - [Blocks discovery and overrides](/guide/editor/blocks-discovery.md) — full explanation of the mechanism
 - [Blocks architecture](/guide/editor/blocks-architecture.md) — overview of the blocks system
+- [Override default page templates](/guide/editor/override-default-templates.md) — replace the default homepage, category, product, header, and footer blocks
 - [Components](/guide/modules/components.md) — how to add or override generic Vue components (non block)

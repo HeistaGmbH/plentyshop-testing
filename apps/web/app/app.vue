@@ -72,24 +72,32 @@
       v-if="blocksConfigurationDrawerOpen && clientPreview"
       class="flex-shrink-0 bg-white font-editor border-l border-gray-300 overflow-y-auto"
     />
+
+    <component
+      :is="VersionHistoryDrawer"
+      v-if="drawerOpen && clientPreview"
+      class="flex-shrink-0 bg-white font-editor border-l border-gray-300 overflow-y-auto"
+    />
   </div>
   <ClientOnly>
     <component :is="PageModal" v-if="clientPreview" />
     <component :is="UnlinkCategoryModal" v-if="clientPreview" />
     <component :is="ResetProductPageModal" v-if="clientPreview" />
     <component :is="AddBlockPopoverComponent" v-if="clientPreview" />
+    <component :is="RestoreSnapshotModal" v-if="clientPreview" />
   </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { useMediaQuery } from '@vueuse/core';
-import { isCssUrl, isJsUrl } from '~/utils/assets';
 import { categoryGetters } from '@plentymarkets/shop-api';
 
 const bodyClass = ref('');
 const route = useRoute();
 const { disableActions } = useEditor();
 const { siteConfigurationDrawerOpen, blocksConfigurationDrawerOpen, currentFont } = useSiteConfiguration();
+const { drawerOpen, entityKey, resetForCurrentEntity } = useBlockSnapshots();
+const { resetHistory } = useBlockHistory();
 const { setStaticPageMeta } = useUrlPageMeta();
 const { isInEditorClient, isMobilePreview, previewWidth } = useEditorState();
 
@@ -107,7 +115,7 @@ const { getSetting: getMetaDescription } = useSiteSettings('metaDescription');
 const { getSetting: getMetaKeywords } = useSiteSettings('metaKeywords');
 const { getSetting: getRobots } = useSiteSettings('robots');
 const { getSetting: getPrimaryColor } = useSiteSettings('primaryColor');
-const { getSetting: customAssetsSafeMode } = useSiteSettings('customAssetsSafeMode');
+const { getBooleanSetting: customAssetsSafeMode } = useSiteSettings('customAssetsSafeMode');
 
 const { data: productsCatalog } = useProducts();
 
@@ -269,6 +277,23 @@ if (import.meta.client) {
       if (clientPreview.value) contentRef.value?.scrollTo({ top: 0 });
     },
   );
+
+  watch(entityKey, () => {
+    resetForCurrentEntity();
+  });
+
+  watch(entityKey, () => {
+    resetHistory();
+  });
+
+  watch(
+    () => route.fullPath,
+    () => {
+      if (route.meta.pageType === 'static') {
+        setStaticPageMeta();
+      }
+    },
+  );
 }
 
 if (route?.meta.pageType === 'static') setStaticPageMeta();
@@ -295,6 +320,12 @@ const ResetProductPageModal = defineAsyncComponent(
   () => import('~/components/ui/ResetProductPageModal/ResetProductPageModal.vue'),
 );
 const AddBlockPopoverComponent = defineAsyncComponent(() => import('~/components/AddBlockPopover/AddBlockPopover.vue'));
+const VersionHistoryDrawer = defineAsyncComponent(
+  () => import('~/components/VersionHistoryDrawer/VersionHistoryDrawer.vue'),
+);
+const RestoreSnapshotModal = defineAsyncComponent(
+  () => import('~/components/ui/RestoreSnapshotModal/RestoreSnapshotModal.vue'),
+);
 </script>
 
 <style lang="scss">

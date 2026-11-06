@@ -137,7 +137,7 @@
               <span>{{ t('common.labels.asterisk') }}</span>
             </span>
             <span
-              v-if="crossedPrice && differentPrices(price, crossedPrice)"
+              v-if="crossedPrice && differentPrices(price, crossedPrice) && crossedPrice > price"
               class="typography-text-sm text-neutral-500 line-through @md:ml-3 @md:pb-2"
             >
               {{ format(crossedPrice) }}
@@ -181,7 +181,6 @@
 import { productGetters, productImageGetters } from '@plentymarkets/shop-api';
 import { SfIconShoppingCart, SfLoaderCircular, SfRating, SfCounter } from '@storefront-ui/vue';
 import type { ProductCardProps } from '~/components/ui/ProductCard/types';
-import { defaults } from '~/composables';
 import type { ItemGridContent } from '~/components/blocks/ItemGrid/types';
 import type { BasketItemOrderParamsProperty, Product, DoAddItemParams } from '@plentymarkets/shop-api';
 
@@ -289,7 +288,8 @@ const productPath = computed(() => {
     return localePath(paths.globalItemDetails);
   }
   if (useCallisto().isEnabled) {
-    return localePath(`/${productGetters.getUrlPath(product.value)}/a-${productGetters.getItemId(product.value)}`);
+    const urlPath = productGetters.getUrlPath(product.value);
+    return localePath(`${urlPath ? `/${urlPath}` : ''}/a-${productGetters.getItemId(product.value)}`);
   }
   const basePath = `/${productGetters.getUrlPath(product.value)}_${productGetters.getItemId(product.value)}`;
   const shouldAppendVariation = productGetters.shouldAppendVariationToLink(product.value);

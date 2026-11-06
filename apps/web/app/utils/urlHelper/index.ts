@@ -32,9 +32,29 @@ export const handlePreviousRouteNavigation = (dependencies: NavigationDependenci
 };
 
 const INTERNAL_HREF_PATTERN = /^\/(?!\/)/;
+const FILE_EXTENSION_PATTERN = /\.[a-zA-Z0-9]+$/;
+
+export const isFileLikeHref = (href: string): boolean => {
+  const pathname = href.split(/[?#]/)[0] ?? '';
+  const lastSegment = pathname.slice(pathname.lastIndexOf('/') + 1);
+  return FILE_EXTENSION_PATTERN.test(lastSegment);
+};
 
 export const isInternalLink = (href: string, router: ReturnType<typeof useRouter>): boolean => {
-  if (!INTERNAL_HREF_PATTERN.test(href)) return false;
+  if (!INTERNAL_HREF_PATTERN.test(href) || isFileLikeHref(href)) return false;
   const resolved = router.resolve(href);
   return resolved.matched.length > 0 && resolved.name !== 'error';
 };
+
+export const localizeHtmlLinks = (
+  html: string,
+  router: ReturnType<typeof useRouter>,
+  localePath: ReturnType<typeof useLocalePath>,
+  resolveTrailingSlash: (path: string) => string,
+): string =>
+  html.replace(/<a\b([^>]*?)href=(["'])([^"']*?)\2/gi, (match, before, quote, href) => {
+    if (isInternalLink(href, router)) {
+      return `<a${before}href=${quote}${resolveTrailingSlash(localePath(href))}${quote}`;
+    }
+    return match;
+  });

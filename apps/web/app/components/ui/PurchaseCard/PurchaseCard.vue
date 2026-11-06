@@ -15,13 +15,22 @@
                 :class="{ 'ring-2 ring-blue-500 ring-offset-1 rounded': highlightedUuid === key.uuid }"
                 :data-uuid="key.uuid"
                 class="mb-2 font-normal typography-text-sm break-words no-preflight rte-prose rte-prose--render transition-all duration-300"
-                v-html="replacePropertyPlaceholdersInHtml(key.content, props.product)"
+                v-html="renderTextBlock(key.content)"
               />
             </template>
             <template v-if="key === 'itemName' && configuration?.fields.itemName">
               <h1 class="font-bold typography-headline-4 break-word" data-testid="product-name">
                 {{ productGetters.getName(product) }}
               </h1>
+            </template>
+            <template v-if="key === 'variationNumber' && configuration?.fields.variationNumber">
+              <p
+                v-if="productGetters.getVariationNumber(product)"
+                class="mb-2 typography-text-sm text-neutral-500"
+                data-testid="product-variation-number"
+              >
+                {{ productGetters.getVariationNumber(product) }}
+              </p>
             </template>
             <template v-if="key === 'price' && configuration?.fields.price">
               <div class="flex space-x-2">
@@ -123,6 +132,9 @@
             <template v-if="key === 'graduatedPrices' && configuration?.fields.graduatedPrices">
               <GraduatedPriceList :count="quantitySelectorValue" :product="product" />
             </template>
+            <template v-if="key === 'guaranteeLabel' && configuration?.fields.guaranteeLabel">
+              <GuaranteeBlock :product="product" max-width="20rem" class="m-4" />
+            </template>
 
             <template v-if="key === 'quantityAndAddToCart' && configuration?.fields.quantityAndAddToCart">
               <UnitContentSelect
@@ -177,7 +189,7 @@
                   <i18n-t keypath="shipping.excludedLabel" scope="global">
                     <template #shipping>
                       <UiLink
-                        :href="localePath(paths.shipping)"
+                        :href="resolvePathTrailingSlash(localePath(paths.shipping))"
                         class="focus:outline focus:outline-offset-2 focus:outline-2 outline-secondary-600 rounded"
                         target="_blank"
                       >
@@ -230,8 +242,6 @@ import { productGetters, reviewGetters, productBundleGetters } from '@plentymark
 import { SfCounter, SfRating, SfIconShoppingCart, SfLoaderCircular, SfTooltip } from '@storefront-ui/vue';
 import type { PriceCardPadding, PriceCardTextBlockItem, PurchaseCardProps } from '~/components/ui/PurchaseCard/types';
 import type { PayPalAddToCartCallback } from '#paypal/types';
-import { paths } from '~/utils/paths';
-
 const isTextBlock = (item: unknown): item is PriceCardTextBlockItem =>
   typeof item === 'object' && item !== null && (item as PriceCardTextBlockItem).type === 'textBlock';
 
@@ -241,6 +251,7 @@ const props = withDefaults(defineProps<PurchaseCardProps>(), {
   configuration: () => ({
     fields: {
       itemName: true,
+      variationNumber: false,
       price: true,
       tags: true,
       availability: true,
@@ -253,11 +264,13 @@ const props = withDefaults(defineProps<PurchaseCardProps>(), {
       graduatedPrices: true,
       addToWishlist: true,
       quantityAndAddToCart: true,
+      guaranteeLabel: true,
       itemText: false,
       technicalData: false,
     },
     fieldsOrder: [
       'itemName',
+      'variationNumber',
       'price',
       'tags',
       'availability',
@@ -269,6 +282,7 @@ const props = withDefaults(defineProps<PurchaseCardProps>(), {
       'itemBundle',
       'graduatedPrices',
       'addToWishlist',
+      'guaranteeLabel',
       'quantityAndAddToCart',
       'itemText',
       'technicalData',
@@ -316,9 +330,17 @@ const { isWishlistItem } = useWishlist();
 const { openQuickCheckout } = useQuickCheckout();
 const { crossedPrice } = useProductPrice(props?.product);
 const { reviewArea } = useProductReviews(Number(productGetters.getId(props?.product)));
-const { getSetting: getNotifyMeSetting } = useSiteSettings('showNotifyMe');
-const showNotifyMe = computed(() => getNotifyMeSetting().toString() === 'true');
+const { getBooleanSetting: getNotifyMeSetting } = useSiteSettings('showNotifyMe');
+const showNotifyMe = computed(() => getNotifyMeSetting());
 const localePath = useLocalePath();
+const router = useRouter();
+const { resolvePathTrailingSlash } = useUrlTrailingSlash();
+
+const renderTextBlock = (html: string): string =>
+  replacePropertyPlaceholdersInHtml(
+    localizeHtmlLinks(html, router, localePath, resolvePathTrailingSlash),
+    props.product,
+  );
 
 const inlineStyle = computed(() => {
   const layout = props?.configuration?.layout || ({} as PriceCardPadding);

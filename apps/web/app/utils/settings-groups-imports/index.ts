@@ -2,9 +2,14 @@ import type { SettingsGroupLoader } from './types';
 
 // TODO: see if we can use https://github.com/nuxt/nuxt/releases/tag/v3.19.0 to replace the import.meta.glob
 
-const customer = import.meta.glob('/node_modules/*/runtime/components/settings/**/*.vue', {
-  import: 'default',
-}) as Record<string, SettingsGroupLoader>;
+const customerRoot = import.meta.glob('/node_modules/*/runtime/components/settings/**/*.vue', { import: 'default' });
+
+const customerWorkspace = import.meta.glob(
+  '@workspace/node_modules/{*,@*/*}/{,*/}runtime/components/settings/**/*.vue',
+  { import: 'default' },
+);
+
+const customer = { ...customerRoot, ...customerWorkspace } as Record<string, SettingsGroupLoader>;
 
 const nuxtModules = import.meta.glob('~~/modules/*/runtime/components/settings/**/*.vue', {
   import: 'default',
@@ -35,9 +40,17 @@ const normalize = (path: string) => {
 
 const modules: Record<string, SettingsGroupLoader> = {};
 
-Object.entries(core).forEach(([path, loader]) => (modules[normalize(path)] = loader));
-Object.entries(nuxtModules).forEach(([path, loader]) => (modules[normalize(path)] = loader));
-Object.entries(customer).forEach(([path, loader]) => (modules[normalize(path)] = loader));
+const registerModules = (entries: Record<string, SettingsGroupLoader>) => {
+  Object.entries(entries).forEach(([path, loader]) => {
+    if (isSettingsPathAuthorized(path)) {
+      modules[normalize(path)] = loader;
+    }
+  });
+};
+
+registerModules(core);
+registerModules(nuxtModules);
+registerModules(customer);
 
 export const getSettingsGroups = (activeSetting: string, subCategory: string = '') => {
   const prefix = subCategory ? `${activeSetting}/${subCategory}/` : `${activeSetting}/`;

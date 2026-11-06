@@ -11,7 +11,7 @@
       <button
         v-if="isProductPage"
         type="button"
-        class="flex-1 min-w-0 inline-flex items-center justify-center gap-1.5 rounded-lg border py-1.5 text-sm font-extrabold cursor-pointer transition-shadow border-gray-300 bg-white text-slate-900 shadow-sm hover:bg-gray-100"
+        class="flex-1 min-w-0 inline-flex items-center justify-center gap-1.5 rounded-lg border py-1.5 text-sm font-bold cursor-pointer transition-shadow border-gray-300 bg-white text-slate-900 shadow-sm hover:bg-gray-100"
         data-testid="rte-properties-button"
         @mousedown.prevent
         @click="openPropertiesModal"
@@ -90,6 +90,8 @@
     >
       <EditorContent :editor="editor" :style="editorStyle" class="rte__content rte-prose" />
     </div>
+
+    <EditorCustomCodeHints :content="modelValue" />
   </div>
 
   <EditorRichTextEditorRichtextEditorModal
@@ -117,6 +119,7 @@
     :text-color="textColor"
     :toggle-link="toggleLink"
     :undo="undo"
+    :content="modelValue"
     @close="closeModal"
     @switch-to-html="handleSwitchToHtml"
   />

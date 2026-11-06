@@ -1,3 +1,5 @@
+import { GUARANTEE_NOTICE_DISPLAY_MODE_SETTING } from '../utils/checkout/guarantee-notice-display-mode';
+
 export default {
   useAvif: process.env?.IMAGEAVIF === 'true' || process.env?.NUXT_PUBLIC_USE_AVIF === 'true',
   useWebp: process.env?.IMAGEWEBP === 'true' || process.env?.NUXT_PUBLIC_USE_WEBP === 'true',
@@ -96,13 +98,14 @@ export default {
   iconColor: process.env.NUXT_PUBLIC_ICON_COLOR || '#ffffff',
   showCustomerWishComponent: process.env.NUXT_PUBLIC_SHOW_CUSTOMER_WISH_COMPONENT === 'true',
   showCustomerReferenceComponent: process.env.NUXT_PUBLIC_SHOW_CUSTOMER_REFERENCE_COMPONENT === 'true',
+  [GUARANTEE_NOTICE_DISPLAY_MODE_SETTING]: process.env.NUXT_PUBLIC_GUARANTEE_NOTICE_DISPLAY_MODE || '',
   bundleItemDisplay: process.env.NUXT_PUBLIC_BUNDLE_ITEM_DISPLAY || '2',
   externalVatCheckInactive: process.env.NUXT_PUBLIC_EXTERNAL_VAT_CHECK_INACTIVE === 'true',
   showNotifyMe: process.env.NUXT_PUBLIC_SHOW_NOTIFY_ME === 'true',
   itemSortByMonthlySales: process.env.NUXT_PUBLIC_ITEM_SORT_BY_MONTHLY_SALES || '0',
   defaultCustomerClassId: process.env.NUXT_PUBLIC_DEFAULT_CUSTOMER_CLASS_ID || '0',
   defaultCustomerB2BClassId: process.env.NUXT_PUBLIC_DEFAULT_CUSTOMER_B2B_CLASS_ID || '0',
-  defaultB2BClassIds: process.env.NUXT_PUBLIC_DEFAULT_B2B_CLASS_IDS || '[]',
+  allCustomerB2BClassIds: process.env.NUXT_PUBLIC_ALL_CUSTOMER_B2B_CLASS_IDS || '[]',
   fetchDynamicTranslations: false,
   sessionLifetime: process.env.NUXT_PUBLIC_SESSION_LIFETIME || '3600',
   shippingTextCategoryId: process.env.NUXT_PUBLIC_SHIPPING_TEXT_CATEGORY_ID || '',
@@ -123,4 +126,5 @@ export default {
   customAssetsSafeMode: process.env.NUXT_PUBLIC_CUSTOM_ASSETS_SAFE_MODE === 'true',
   enableSingleProductUrlScheme: process.env.NUXT_PUBLIC_ENABLE_SINGLE_PRODUCT_URL_SCHEME === 'true',
   enableOrderChangePaymentMethod: process.env.NUXT_PUBLIC_ENABLE_ORDER_CHANGE_PAYMENT_METHOD !== 'false',
+  enableLastSeenTracking: process.env.NUXT_PUBLIC_ENABLE_LAST_SEEN_TRACKING === 'true',
 };

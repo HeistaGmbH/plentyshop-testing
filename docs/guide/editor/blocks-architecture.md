@@ -44,7 +44,7 @@ The response contains three top-level properties:
 A helper normalises the API response.
 If any part of the response is missing, smart defaults are used:
 
-- A missing `HeaderContainer`, `Footer`, or empty `blocks` array is replaced with a default provided by the corresponding factory (`utils/blockTemplates/`).
+- A missing `HeaderContainer`, `Footer`, or empty `blocks` array is replaced with a default provided by the corresponding factory (`utils/blockTemplates/`). A Nuxt module can replace these factories, see [How to override default page templates](/guide/editor/override-default-templates.md).
 
 ### State management
 
@@ -105,7 +105,7 @@ The header and footer are editable here and changes propagate to all pages.
 
 ### Developer adding a new block type
 
-A developer creates a new folder under `components/blocks/` containing the block's `.vue` component and its paired `Form.vue`, a `defaults.ts` that exports the catalogue entry via `getBlocksList()`, and an `icon.svg`. No manual registration is needed, the shop discovers the block by itself from a fixed set of glob patterns. See [Blocks discovery and overrides](/guide/editor/blocks-discovery.md) for the full mechanism and how Nuxt modules contribute the same way.
+A developer creates a new folder under `components/blocks/` containing the block's `.vue` component and its paired `Form.vue`, a `defaults.ts` that exports the catalogue entry via `getBlocksList()`, and an `icon.svg`. No manual registration is needed, the shop discovers the block by itself from a fixed set of glob patterns. See [Blocks discovery and overrides](/guide/editor/blocks-discovery.md) for the full mechanism and how Nuxt modules contribute the same way, or [How to create a block](/guide/editor/create-a-block.md) for step-by-step instructions.
 
 ### Content manager building a landing page
 
@@ -116,9 +116,10 @@ Because content categories are blockified, they can use the full blocks editor t
 
 How-to guides
 
-1. [Site settings](/guide/editor/site-settings.md) — How to add custom settings to the editor
-2. [How to add or override a block from a module](/guide/modules/blocks.md)
-3. [Editor overview](/guide/editor/index.md) — Overview of all editor-related guides
+1. [How to create a block](/guide/editor/create-a-block.md) — Step-by-step guide to scaffolding and registering a new block
+2. [Site settings](/guide/editor/site-settings.md) — How to add custom settings to the editor
+3. [How to add or override a block from a module](/guide/modules/blocks.md)
+4. [Editor overview](/guide/editor/index.md) — Overview of all editor-related guides
 
 Linked concepts
 
@@ -127,5 +128,5 @@ Linked concepts
 3. [Blocks saving](/guide/editor/blocks-saving.md) — How block data is persisted
 4. [Global blocks vs. non-global blocks](/guide/editor/blocks-global-vs-non-global.md) — The distinction between global and page-specific blocks
 5. [Structure vs. content form](/guide/editor/blocks-structure-vs-content.md) — The two block types and how they compose
-6. [Data flow](https://docs.vuestorefront.io/general/basics/data-flow) — General Alokai data flow concept
+6. [Data flow](https://docs.alokai.com/general/basics/data-flow) — General Alokai data flow concept
 7. [Composable-centric data fetching](/guide/themes/composable-centric-data-fetching.md) — How composables manage data in plentyshop PWA

@@ -41,7 +41,7 @@ const { navigateTo } = vi.hoisted(() => ({
 }));
 
 const { useRoute } = vi.hoisted(() => ({
-  useRoute: vi.fn(() => ({ path: '/' })),
+  useRoute: vi.fn(() => ({ path: '/', meta: {} })),
 }));
 
 mockNuxtImport('useEditor', () => useEditor);
@@ -229,7 +229,7 @@ describe('useEditorUnsavedChangesGuard', () => {
     });
 
     it('should use custom hasUnsavedChanges function', () => {
-      const customHasUnsavedChanges = vi.fn(() => true);
+      const customHasUnsavedChanges = vi.fn().mockReturnValue(true);
 
       const TestComponent = {
         setup() {
@@ -335,7 +335,7 @@ describe('useEditorUnsavedChangesGuard', () => {
     });
 
     it('should use custom hasUnsavedChanges for route leave', () => {
-      const customHasUnsavedChanges = vi.fn(() => true);
+      const customHasUnsavedChanges = vi.fn().mockReturnValue(true);
       const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
       const TestComponent = {

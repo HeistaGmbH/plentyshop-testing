@@ -6,7 +6,6 @@ import { TextStyle } from '@tiptap/extension-text-style';
 import Color from '@tiptap/extension-color';
 import Highlight from '@tiptap/extension-highlight';
 import TextAlign from '@tiptap/extension-text-align';
-import type { RteCommand, UseRichTextEditorArgs } from '~/composables/useRichTextEditor/types';
 import { setupRichTextEditorExpansion } from './helpers/expansion';
 import { setupRichTextEditorBlocks } from './helpers/blocks';
 import { setupRichTextEditorColors } from './helpers/colors';
@@ -16,6 +15,7 @@ import { setupRichTextEditorLinksFormatting } from './helpers/linksFormatting';
 import { stripInlineFontSizesFromHtml } from './helpers/pasteSanitizer';
 import { CustomLink } from './helpers/customLinkExtension';
 import { FontSize } from './helpers/fontSizeExtension';
+import { HeadingVariant } from './helpers/headingExtension';
 import { IconNode } from './helpers/iconExtension';
 import { AtomSelectionDecoration } from './helpers/atomSelectionDecoration';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -38,6 +38,7 @@ export function useRichTextEditor(args: UseRichTextEditorArgs) {
         link: false,
         underline: false,
       }),
+      HeadingVariant,
       Underline,
       CustomLink.configure({
         openOnClick: false,

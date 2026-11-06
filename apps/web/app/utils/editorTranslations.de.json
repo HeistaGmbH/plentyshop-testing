@@ -23,6 +23,7 @@
   "category": "Category Settings",
   "sorting": "Sorting",
   "checkout": "Checkout",
+  "legal-guarantee": "Legal guarantee",
   "other-settings": "Other Settings",
   "search": "Search",
   "customize-search-results": "Customise search results",
@@ -33,6 +34,7 @@
   "performance": "Performance",
   "contact-form": "Contact Form",
   "shipping-information-page": "Shipping information page",
+  "privacy": "Privacy",
   "filter.prices.price_asc": "Price ⬆",
   "filter.prices.price_desc": "Price ⬇",
   "filter.position_asc": "Position ⬆",
@@ -82,5 +84,10 @@
   "block-reset-success": "Blocks reset successfully. Please refresh the page.",
   "block-reset-error": "An error occurred while resetting the blocks. {error}",
   "unsaved-changes-confirm": "You have unsaved changes. Are you sure you want to leave?",
-  "block-edit-homepage-only": "You can only edit the {blockName} on the homepage"
+  "block-edit-homepage-only": "You can only edit the {blockName} on the homepage",
+  "snapshot-list-error": "Failed to load version history.",
+  "snapshot-restore-success": "Version restored. Save changes to keep it.",
+  "snapshot-restore-error": "Failed to restore this version.",
+  "snapshot-group-today": "Today",
+  "snapshot-group-yesterday": "Yesterday"
 }

@@ -256,7 +256,7 @@
     "addButton": "Add billing address",
     "description": "Add a billing address. You will receive the invoice to the email address provided above.",
     "heading": "Billing Address",
-    "methodChanged": "The selected payment method is not available anymore."
+    "methodChanged": "The selected payment method is not available anymore. An alternative payment method has been selected, if available."
   },
   "cart": {
     "empty": "Your cart is empty",
@@ -336,6 +336,13 @@
     },
     "googlePay": {
       "paymentInProgress": "Payment in progress..."
+    },
+    "guaranteeNotice": "Your legal guarantee rights"
+  },
+  "guaranteeLabels": {
+    "area": {
+      "close": "Close guarantee of durability details",
+      "open": "Open guarantee of durability details"
     }
   },
   "customAssets": {
@@ -869,6 +876,13 @@
     "confirmation": {
       "newsletterOptInMessage": "Your email address has been confirmed.",
       "newsletterOptInMessageError": "An error occurred while confirming your email."
+    },
+    "unsubscribe": {
+      "label": "Newsletter Unsubscribe",
+      "heading": "Unsubscribe from Newsletter",
+      "info": "Enter your email address below to unsubscribe from our newsletter.",
+      "submit": "Unsubscribe",
+      "success": "You have been successfully unsubscribed from our newsletter."
     }
   },
   "offers": {
@@ -890,7 +904,8 @@
     "successHeader": "Thank you for your order!",
     "successImageAlt": "order successful image",
     "successMessage": "Your order was completed successfully.",
-    "successReturnHeader": "Thank you for your return!"
+    "successReturnHeader": "Thank you for your return!",
+    "rebate": "Rebate"
   },
   "orderConfirmation": {
     "confirmationSendTo": "A confirmation with all details has been sent to {email}",
@@ -1283,6 +1298,7 @@
       "additionalAuthRequiredName": "Confirmation of the last name is required to access this order.",
       "assignPaymentFailed": "The payment could not be assigned to the order.",
       "createFailed": "The order could not be created.",
+      "duplicateOrder": "The order has already been created. Please check your emails.",
       "loadOrdersFailed": "The orders could not be loaded.",
       "migrateUnauthorized": "The order could not be added to your account.",
       "notFound": "The order does not exist.",
@@ -1291,6 +1307,9 @@
       "paymentMethodNotExist": "The selected payment method does not exist.",
       "paymentMethodSwitchFailed": "The payment method could not be switched. Please try again.",
       "paymentMethodSwitchDisabled": "Switching the payment method is disabled."
+    },
+    "orderProperty": {
+      "fileUploadFailed": "Upload failed. Please ensure the SVG syntax is valid and remove any <!DOCTYPE> declarations before trying again."
     },
     "security": {
       "invalidCsrfToken": "For your security, this action was forbidden. Please try to refresh the page.",
@@ -1302,6 +1321,9 @@
     },
     "notifyMe": {
       "alreadySubscribed": "You have already subscribed to this product"
+    },
+    "checkout": {
+      "shippingProviderNotExisting": "The selected shipping provider no longer exists. Please choose a different shipping provider."
     },
     "unknownError": "An unknown error has occurred."
   },

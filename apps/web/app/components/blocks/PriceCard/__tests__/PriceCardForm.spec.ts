@@ -30,6 +30,7 @@ mockNuxtImport('useEditorOptionsTabs', () => () => ({
 const createContent = (): PriceCardContent => ({
   fields: {
     itemName: true,
+    variationNumber: false,
     price: true,
     tags: false,
     availability: false,
@@ -43,9 +44,10 @@ const createContent = (): PriceCardContent => ({
     addToWishlist: false,
     quantityAndAddToCart: false,
     itemText: false,
+    guaranteeLabel: false,
     technicalData: false,
   },
-  fieldsOrder: ['itemName', 'price'] as PriceCardOrderItem[],
+  fieldsOrder: ['itemName', 'variationNumber', 'price'] as PriceCardOrderItem[],
   fieldsDisabled: [],
   wishlistSize: 'small',
   dropShadow: false,
@@ -61,6 +63,9 @@ const createTextBlock = (overrides?: Partial<PriceCardTextBlockItem>): PriceCard
   visible: true,
   ...overrides,
 });
+
+const findTextBlock = (fieldsOrder: PriceCardOrderItem[], uuid: string) =>
+  fieldsOrder.find((field): field is PriceCardTextBlockItem => typeof field === 'object' && field.uuid === uuid);
 
 const DraggableStub = defineComponent({
   name: 'draggable',
@@ -137,8 +142,8 @@ describe('PriceCardForm', () => {
 
       await wrapper.getByTestId('actions-add-text-block-button').trigger('click');
 
-      expect(content.fieldsOrder).toHaveLength(3);
-      const added = content.fieldsOrder[2] as PriceCardTextBlockItem;
+      expect(content.fieldsOrder).toHaveLength(4);
+      const added = content.fieldsOrder[3] as PriceCardTextBlockItem;
       expect(added.type).toBe('textBlock');
       expect(added.uuid).toBe('test-uuid-123');
       expect(added.content).toBe('');
@@ -217,10 +222,8 @@ describe('PriceCardForm', () => {
 
       await wrapper.getByTestId('price-card-delete-textblock-tb-uuid-1').trigger('click');
 
-      expect(content.fieldsOrder).toHaveLength(2);
-      expect(
-        content.fieldsOrder.every((f) => typeof f !== 'object' || (f as PriceCardTextBlockItem).uuid !== 'tb-uuid-1'),
-      ).toBe(true);
+      expect(content.fieldsOrder).toHaveLength(3);
+      expect(findTextBlock(content.fieldsOrder, 'tb-uuid-1')).toBeUndefined();
     });
 
     it('should close the RTE when the open text block is deleted', async () => {
@@ -245,11 +248,23 @@ describe('PriceCardForm', () => {
 
       await wrapper.getByTestId('price-card-visible-textblock-tb-uuid-1').trigger('click');
 
-      const textBlock = content.fieldsOrder.find(
-        (field): field is PriceCardTextBlockItem =>
-          typeof field === 'object' && (field as PriceCardTextBlockItem).uuid === 'tb-uuid-1',
-      );
+      const textBlock = findTextBlock(content.fieldsOrder, 'tb-uuid-1');
       expect(textBlock?.visible).toBe(false);
+    });
+  });
+
+  describe('variation number field', () => {
+    it('should render the variation number field row', () => {
+      const wrapper = mountForm();
+      expect(wrapper.getByTestId('price-card-field-variationNumber')).toBeTruthy();
+    });
+
+    it('should update fields.variationNumber when the switch is toggled', async () => {
+      const wrapper = mountForm();
+
+      await wrapper.getByTestId('price-card-visible-variationNumber').trigger('click');
+
+      expect(content.fields.variationNumber).toBe(true);
     });
   });
 
@@ -266,10 +281,7 @@ describe('PriceCardForm', () => {
       await wrapper.getByTestId('rte-emit-btn').trigger('click');
       await nextTick();
 
-      const textBlock = content.fieldsOrder.find(
-        (field): field is PriceCardTextBlockItem =>
-          typeof field === 'object' && (field as PriceCardTextBlockItem).uuid === 'tb-uuid-1',
-      );
+      const textBlock = findTextBlock(content.fieldsOrder, 'tb-uuid-1');
       expect(textBlock?.content).toBe('<p>Updated</p>');
     });
   });

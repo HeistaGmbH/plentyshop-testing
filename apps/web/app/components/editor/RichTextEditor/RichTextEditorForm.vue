@@ -57,6 +57,8 @@
           <li v-for="(e, idx) in htmlErrors.slice(0, 3)" :key="idx">{{ e }}</li>
         </ul>
       </div>
+
+      <EditorCustomCodeHints :content="htmlDraft" />
     </div>
 
     <EditorHtmlEditor
@@ -95,12 +97,10 @@ const contentModel = computed<string>({
   set: (val) => emit('update:modelValue', val),
 });
 
-const editorModeOptions = computed(
-  (): Array<{ value: EditorMode; label: string; testId: string }> => [
-    { value: 'wysiwyg', label: getEditorTranslation('wysiwyg-label'), testId: 'mode-wysiwyg' },
-    { value: 'html', label: getEditorTranslation('html-label'), testId: 'mode-html' },
-  ],
-);
+const editorModeOptions = computed((): Array<{ value: EditorMode; label: string; testId: string }> => [
+  { value: 'wysiwyg', label: getEditorTranslation('wysiwyg-label'), testId: 'mode-wysiwyg' },
+  { value: 'html', label: getEditorTranslation('html-label'), testId: 'mode-html' },
+]);
 
 const { editorMode, htmlDraft, htmlErrors, ariaDescribedBy, switchToHtmlMode, switchToWysiwygMode } = useHtmlEditorMode(
   contentModel,
