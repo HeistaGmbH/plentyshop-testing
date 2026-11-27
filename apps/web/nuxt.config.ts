@@ -6,6 +6,7 @@ import { appConfiguration } from './app/configuration/app.config';
 import cookieConfig from './app/configuration/cookie.config';
 import { paths } from './app/utils/paths';
 import settingsConfig from './app/configuration/settings.config';
+import runtimeConfig from './app/configuration/runtime.config';
 import featureFlagsConfig from './app/configuration/feature-flags.config';
 import { FailOnLargeChunksPlugin, FailOnForbiddenDataInPublicFolderPlugin } from './app/configuration/vite.config';
 import { FailOnUnmarkedBlockOverridesPlugin } from './app/configuration/vite.block-overrides';
@@ -15,6 +16,7 @@ export default defineNuxtConfig({
   srcDir: 'app/',
   telemetry: false,
   devtools: { enabled: true },
+  devServer: { host: 'localhost' },
   css: ['~/assets/richtext.css'],
   typescript: {
     typeCheck: false, // type checking runs via `npm run typecheck`, on build, and in CI (fitness-code-quality)
@@ -40,6 +42,7 @@ export default defineNuxtConfig({
     '@workspace': resolve(__dirname, '..', '..'),
   },
   vite: {
+    clearScreen: false,
     server: {
       fs: {
         allow: ['../../..'], // relative to the current nuxt.config.ts
@@ -140,6 +143,7 @@ export default defineNuxtConfig({
       noCache: process.env.NO_CACHE || '',
       configId: process.env.CONFIG_ID || '',
       ...settingsConfig,
+      ...runtimeConfig,
       ...featureFlagsConfig,
     },
   },

@@ -11,6 +11,8 @@ export interface UseSiteSettingsDeps {
     };
   };
   runtimeConfigPublic: Record<string, unknown>;
+  settingsConfigKeys: string[];
+  e2eOverrides?: Record<string, unknown>;
 }
 
 export interface UseSiteSettingsState {
@@ -21,6 +23,7 @@ export interface UseSiteSettingsState {
     [key: string]: unknown;
   };
   loading: boolean;
+  backendKeys: string[];
 }
 
 export type UpdateSetting = (value: string | number) => void;
